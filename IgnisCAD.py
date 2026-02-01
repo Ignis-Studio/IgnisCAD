@@ -71,20 +71,48 @@ def Item(name):
 
 
 def show():
-    """全局 show 函数，自动寻找刚才定义的零件"""
+    """
+    能连上 VSCode 就连，连不上就直接保存 STL。
+    不报错，不废话。
+    """
     global _GLOBAL_LAST_PART
-    if _GLOBAL_LAST_PART:
-        print(f"👀 Rendering: {_GLOBAL_LAST_PART.label}")
-        try:
-            from ocp_vscode import show as ocp_show
-            # 渲染底层的 part 对象
-            ocp_show(_GLOBAL_LAST_PART.part, names=[_GLOBAL_LAST_PART.label])
-        except ImportError:
-            filename = f"{_GLOBAL_LAST_PART.label}.stl"
-            _GLOBAL_LAST_PART.part.export_stl(filename)
-            print(f"Scanner saved to {filename}")
-    else:
-        print("⚠️ Nothing to show! Did you forget to use '<<' ?")
+    if not _GLOBAL_LAST_PART:
+        print("⚠️ Nothing to show! (Did you use 'item << ...'?)")
+        return
+
+    label = _GLOBAL_LAST_PART.label or "Model"
+    print(f"👀 Processing: {label}")
+    
+    # 尝试连接 VS Code (ocp_vscode)
+    try:
+        from ocp_vscode import show as ocp_show
+        # 去掉所有花哨参数，回归最原始的调用
+        # 如果 VS Code 插件没开，这里会稍作停顿然后报错或无反应
+        ocp_show(_GLOBAL_LAST_PART.part, names=[label])
+        print(f"✅ Sent to VS Code Viewer (Check your VS Code window)")
+        return
+    except Exception:
+        # 这里的异常可能是 ImportError (没装库) 或 RuntimeError (连不上)
+        # 我们不在乎具体原因，直接降级
+        pass
+
+    # 如果上面失败了，直接导出文件
+    print("⚠️ Viewer not available. Exporting to disk...")
+    
+    # 导出 STL
+    filename = f"{label}.stl"
+    bd.export_stl(_GLOBAL_LAST_PART.part, filename)
+    
+    import os
+    abs_path = os.path.abspath(filename)
+    print(f"💾 Saved: {abs_path}")
+    print("👉 You can open this file with Windows 3D Viewer.")
+    
+    # 【可选】如果你在 Windows 上，这行代码会自动尝试打开它
+    try:
+        os.startfile(abs_path)
+    except:
+        pass
 
 # --- 2. 原语工厂 (Primitives) ---
 # AI 只需要调用这些简单的函数，不需要处理复杂的 build123d 参数

@@ -6,4 +6,5 @@ readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "build123d>=0.10.0",
+    "ocp-vscode>=3.0.1",
 ]
