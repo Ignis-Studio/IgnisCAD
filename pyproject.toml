@@ -1,10 +1,13 @@
 [project]
-name = "py-programming"
+name = "IgnisCAD"
 version = "0.1.0"
-description = "Add your description here"
+description = "Nothing here."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "build123d>=0.10.0",
     "ocp-vscode>=3.0.1",
 ]
+[[tool.uv.index]]
+name = "tuna"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
