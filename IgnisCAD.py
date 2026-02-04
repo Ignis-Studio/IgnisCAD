@@ -1,4 +1,29 @@
 import build123d as bd
+import socketserver, webbrowser
+import sys
+
+# 1. 保存原始的错误处理方法，以免误伤其他真正的报错
+_original_handle_error = socketserver.BaseServer.handle_error
+
+
+def _silent_handle_error(self, request, client_address):
+    """
+    自定义的错误处理器：忽略连接中断错误，其他错误照常打印。
+    """
+    # 获取刚刚发生的异常
+    exc_type, exc_value, _ = sys.exc_info()
+
+    # 检查是否是 WinError 10053 (ConnectionAbortedError)
+    # 或者是 BrokenPipeError (Linux/Mac 上常见的类似错误)
+    if isinstance(exc_value, (ConnectionAbortedError, BrokenPipeError)):
+        return  # 直接忽略，不打印任何东西
+
+    # 如果是其他异常，调用原始方法（打印堆栈跟踪）
+    _original_handle_error(self, request, client_address)
+
+
+# 2. 应用补丁：替换标准库的错误处理方法
+socketserver.BaseServer.handle_error = _silent_handle_error
 _GLOBAL_LAST_PART = None
 
 
@@ -195,32 +220,43 @@ def Item(name):
 
 def show():
     """
-    能连上 VSCode 就连，连不上就直接保存 STL。
+    尝试连接 Yet Another CAD Viewer (浏览器)，
+    如果失败（未安装或报错），则直接保存并打开 STL。
     """
     global _GLOBAL_LAST_PART
     if not _GLOBAL_LAST_PART:
-        print("⚠️ Nothing to show! (Did you use 'item << ...'?)")
+        print("⚠️ Nothing to show! (Did you forget to use 'item << ...'?)")
         return
 
     label = _GLOBAL_LAST_PART.label or "Model"
     print(f"👀 Processing: {label}")
-    
-    # 尝试连接 VS Code (ocp_vscode)
-    try:
-        from ocp_vscode import show as ocp_show
-        ocp_show(_GLOBAL_LAST_PART.part, names=[label])
-        print(f"✅ Sent to VS Code Viewer (Check your VS Code window)")
-        return
-    except Exception:
-        pass
 
-    # 如果上面失败了，直接导出文件
+    # 1. 尝试连接 Yet Another CAD Viewer (YACV)
+    try:
+        from yacv_server import show as yacv_show
+        target_obj = _GLOBAL_LAST_PART
+        yacv_show(target_obj, names=[label])
+
+        url = "http://localhost:32323"
+        print(f"✅ Sent to YACV (Check your browser, at {url})")
+        webbrowser.open(url)
+        input("✅ Press Enter to exit...")
+        return
+    except Exception as e:
+        print(f"⚠️ Failed to connect to YACV: {e}")
+
+    # 2. 如果上面失败了，直接导出 STL 文件
     print("⚠️ Viewer not available. Exporting to disk...")
-    
+
     # 导出 STL
     filename = f"{label}.stl"
-    bd.export_stl(_GLOBAL_LAST_PART, filename)
-    
+
+    try:
+        bd.export_stl(_GLOBAL_LAST_PART, filename)
+    except NameError:
+        import build123d as bd_fallback
+        bd_fallback.export_stl(_GLOBAL_LAST_PART, filename)
+
     import os
     abs_path = os.path.abspath(filename)
     print(f"💾 Saved: {abs_path}")

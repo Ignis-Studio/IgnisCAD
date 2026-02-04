@@ -5,8 +5,9 @@ description = "Nothing here."
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "build123d>=0.10.0",
+    "build123d<0.10",
     "ocp-vscode>=3.0.1",
+    "yacv-server>=0.9.7",
 ]
 [[tool.uv.index]]
 name = "tuna"
