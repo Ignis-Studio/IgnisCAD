@@ -1,8 +1,13 @@
-from IgnisCAD import *
+from igniscad import *
 
 if __name__ == "__main__":
-    with Item("Flange") as item:
-        item << Cylinder(name="base", r=50, h=10)
-        item << Cylinder(name="bolt", r=5, h=20).move(x=item.f("base").radius * 0.8)
-        item << item.f("base") - item.f("bolt")
+    with Item("Robot") as item:
+        with Group("Leg") as leg:
+            foot = Box(20, 30, 5)
+            pole = Cylinder(5, 40).on_top_of(foot)
+
+            leg << pole << foot
+
+        item << leg.move(x=-15) << leg.move(x=15)
+
     show()

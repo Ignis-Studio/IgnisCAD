@@ -29,10 +29,10 @@ class ContextManager:
         用法: item << Cylinder(...) - Box(...)
         """
         if isinstance(other, Entity):
-            self.part = other
+            self.part = self.part + other if self.part else other
             if other.name:
                 self.registry[other.name] = other
-        return self.part  # 允许链式调用
+        return self
 
     def find(self, name):
         return self.f(name)
@@ -62,14 +62,20 @@ class Entity:
         return Entity(p, self.name)
 
     # --- 布尔运算 ---
+    def _wrap_result(self, res):
+        """内部辅助：强制打包结果为 Compound"""
+        if not isinstance(res, (bd.Compound, bd.Solid)):
+            res = bd.Compound(res)
+        return res
+
     def __sub__(self, other):
-        return Entity(self.part - other.part)
+        return self._wrap_result(self.part - other.part)
 
     def __add__(self, other):
-        return Entity(self.part + other.part)
+        return self._wrap_result(self.part + other.part)
 
     def __and__(self, other):
-        return Entity(self.part & other.part)
+        return self._wrap_result(self.part & other.part)
 
     # --- 4. 尺寸与语义感知 (新增) ---
     @property
@@ -113,9 +119,9 @@ class Entity:
 
         # 2. 默认目标位置为 Target 的中心点
         # (如果不修改某轴坐标，默认就是中心对齐)
-        dest_x = t_box.center.X
-        dest_y = t_box.center.Y
-        dest_z = t_box.center.Z
+        dest_x = t_box.center().X
+        dest_y = t_box.center().Y
+        dest_z = t_box.center().Z
 
         # 3. 自身尺寸 (宽、深、高)
         s_w = s_box.size.X
@@ -148,9 +154,9 @@ class Entity:
 
         # 5. 计算位移向量 (目标中心 - 当前中心)
         # 这一步至关重要，因为物体当前不一定在原点
-        curr_x = s_box.center.X
-        curr_y = s_box.center.Y
-        curr_z = s_box.center.Z
+        curr_x = s_box.center().X
+        curr_y = s_box.center().Y
+        curr_z = s_box.center().Z
 
         dx = dest_x - curr_x
         dy = dest_y - curr_y
@@ -213,7 +219,7 @@ def show():
     
     # 导出 STL
     filename = f"{label}.stl"
-    bd.export_stl(_GLOBAL_LAST_PART.part, filename)
+    bd.export_stl(_GLOBAL_LAST_PART, filename)
     
     import os
     abs_path = os.path.abspath(filename)
@@ -245,15 +251,39 @@ def Torus(major, minor, name=None) -> Entity:
 # --- 3. 上下文管理器 (Contexts) ---
 # 用于处理“一组物体”的关系，避免重复写坐标计算
 
-class Group:
+class Group(Entity):
     """
-    逻辑分组。
-    在 with 块内部定义的任何运算不会自动发生，
-    这里主要为了代码折叠和逻辑清晰，或者未来扩展局部坐标系。
+    逻辑分组：将多个实体组合成一个单一实体。
+    支持上下文管理器语法，组内的物体会自动进行布尔并集 (Union)。
+    一旦退出 with 块，该 Group 对象即可像普通 Entity 一样被移动或对齐。
     """
+
+    def __init__(self, name=None):
+        # 初始化时没有内部零件，设为 None
+        # 注意：在添加第一个零件前调用 move/rotate 会报错，这是预期的行为
+        super().__init__(None, name)
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        # 退出 with 块时不需要额外操作
+        # 因为 self.part 已经在 __lshift__ 中实时更新了
         pass
+
+    def __lshift__(self, other):
+        """
+        重载 '<<' 操作符，用于向组内添加物体。
+        执行逻辑：Union (并集)
+        """
+        if isinstance(other, Entity):
+            if self.part is None:
+                # 这是一个新组，第一个物体直接作为基础
+                self.part = other.part
+            else:
+                # 组内已有物体，将新物体与现有物体融合 (Fuse/Union)
+                self.part = self.part + other.part
+        else:
+            raise ValueError("❌ Group implies adding Entity objects (Box, Cylinder, etc.)")
+
+        return self  # 允许链式调用: g << part1 << part2
