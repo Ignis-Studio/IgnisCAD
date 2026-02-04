@@ -6,4 +6,8 @@
 
 ## IgnisCAD
 
-使用 Python 封装 build123d 进行 CAD 开发。
+使用 Python 封装 build123d 进行 CAD 开发，为 AI 建模打造。  
+
+LICENSE：Apache License 2.0  
+
+欢迎使用。  

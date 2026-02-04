@@ -9,4 +9,8 @@ wheels/
 # Virtual environments
 .venv
 
+# Generated models
 *.stl
+
+# IDE config files
+.idea/

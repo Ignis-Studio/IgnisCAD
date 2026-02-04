@@ -1,14 +1,23 @@
 [project]
-name = "IgnisCAD"
+name = "igniscad"
 version = "0.1.0"
-description = "Nothing here."
+description = "A wrapper for the build123d library, designed for AI agents."
 readme = "README.md"
+authors = [
+    { name = "CreeperIsASpy", email = "creeperspy@qq.com" },
+    { name = "Ext0gu1sher", email = "danielhuang070213@qq.com" }
+]
 requires-python = ">=3.11"
 dependencies = [
     "build123d<0.10",
     "ocp-vscode>=3.0.1",
     "yacv-server>=0.9.7",
 ]
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10.0"]
+build-backend = "uv_build"
+
 [[tool.uv.index]]
 name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
