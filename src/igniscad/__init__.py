@@ -1,2 +1,1 @@
-def hello() -> str:
-    return "Hello from igniscad!"
+from .igniscad import *
