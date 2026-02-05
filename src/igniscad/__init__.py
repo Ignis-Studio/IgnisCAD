@@ -1,1 +1,1 @@
-from .igniscad import *
+from igniscad.igniscad import *
