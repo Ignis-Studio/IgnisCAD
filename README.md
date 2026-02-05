@@ -6,7 +6,8 @@
 
 ## IgnisCAD
 
-使用 Python 封装 build123d 进行 CAD 开发，为 AI 建模打造。  
+使用 Python 封装 build123d 进行 CAD 开发，让 AI 智能体可以使用纯文本建模。  
+*A wrapper for the build123d library, designed for AI agents.*  
 
 LICENSE：Apache License 2.0  
 
