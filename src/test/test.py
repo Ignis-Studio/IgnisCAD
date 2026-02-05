@@ -10,4 +10,4 @@ if __name__ == "__main__":
 
         item << leg.move(x=-15) << leg.move(x=15)
 
-    show()
+    show(item)
