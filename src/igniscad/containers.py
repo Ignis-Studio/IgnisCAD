@@ -2,17 +2,15 @@
 Containers which implied session(*with* statements) functions.
 Every container is a context manager.
 """
-
 from igniscad.core import Entity
 
-class Item:
+class Model(Entity):
     """
     A context manager to capture generated models(Entity objects).
     """
 
     def __init__(self, name):
-        self.name = name
-        self.part = None
+        super().__init__(part=None, name=name)
         self.registry = {}
 
     # Context manager for *with* statements.
@@ -28,10 +26,10 @@ class Item:
     def __lshift__(self, other):
         """
         Override the "<<" operator
-        Usage: item << Cylinder(...) - Box(...)
+        Usage: model << Entity(...)
         """
         if isinstance(other, Entity):
-            self.part = self.part + other if self.part else other
+            self.part = self.part + other.part if self.part else other.part
             if other.name:
                 self.registry[other.name] = other
         return self
@@ -42,7 +40,7 @@ class Item:
     # being *disvariabled*
     # you can define an entity without wrapping them into a variable
     # variables are easy to be ripped off between different contexts
-    # you can call this entity anywhere through item.f(<entity.name_in_registry>)
+    # you can call this entity anywhere through model.f(<entity.name_in_registry>)
     # you can also edit the registry by yourself, but that's not recommended.
     def find(self, name: str):
         """
@@ -52,7 +50,7 @@ class Item:
         """
         if name in self.registry:
             return self.registry[name]
-        raise ValueError(f"❌ Part '{name}' not found in this item.")
+        raise ValueError(f"❌ Part '{name}' not found in this model.")
 
     def f(self, name: str):
         return self.find(name)
@@ -60,7 +58,7 @@ class Item:
 class Group(Entity):
     """
     Combine multiple entities into a single Group Entity.
-    Support the same context-manager syntax (as Item does).
+    Support the same context-manager syntax (as Model does).
     Entities within a group are automatically unioned.
     The Group object can be moved or aligned like a normal Entity outside the *with* statements.
     """

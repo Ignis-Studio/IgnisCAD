@@ -6,18 +6,18 @@ import webbrowser
 import build123d as bd
 
 
-def show(item):
+def show(model):
     """
     Try connecting Yet Another CAD Viewer (within the browser)，
     If failed: fallback to save and open the *.stl file.
     """
-    label = item.name or "Model"
+    label = model.name or "Model"
     print(f"👀 Processing: {label}")
 
     # Try connecting Yet Another CAD Viewer (YACV)
     try:
         from yacv_server import show as yacv_show
-        target_obj = item
+        target_obj = model
         yacv_show(target_obj, names=[label])
 
         url = "http://localhost:32323"
@@ -33,10 +33,10 @@ def show(item):
     filename = f"{label}.stl"
 
     try:
-        bd.export_stl(item, filename)
+        bd.export_stl(model, filename)
     except NameError:
         import build123d as bd_fallback
-        bd_fallback.export_stl(item, filename)
+        bd_fallback.export_stl(model, filename)
 
     import os
     abs_path = os.path.abspath(filename)

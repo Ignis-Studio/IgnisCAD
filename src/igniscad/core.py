@@ -7,8 +7,8 @@ Every wrapper has its original build123d object which can be called with:
 
 Registry:
 You can call every named entity in the context like this:
-    item.f(<name>)
-As there will be only one Item in the context, so the function always gives the original Entity.
+    model.f(<name>)
+As there will be only one Model in the context, so the function always gives the original Entity.
 """
 
 import build123d as bd
