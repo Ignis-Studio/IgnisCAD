@@ -2,76 +2,74 @@
 Visualize models via YACV or exporting them to disk.
 """
 
-import webbrowser
+import webbrowser, os
 from typing import Literal
 
 import build123d as bd
 
 from igniscad import Model
+from igniscad._logger_handler import init_sub_logger, get_logger
 
-def _show_yacv_model(model: Model) -> bool:
+init_sub_logger(__name__)
+
+def _show_yacv_model(model: Model, force: bool) -> bool:
     """
-    Try connecting Yet Another CAD Viewer (within the browser)，
+    Try connecting Yet Another CAD Viewer (within the browser).
+    Args:
+        model (Model): The model to visualize.
+        force (bool): whether to fallback or not.
     """
-    try:
-        from yacv_server import show as yacv_show
-        target_obj = model
-        yacv_show(target_obj, names=[model.name])
+    from yacv_server import show as yacv_show
+    target_obj = model
+    yacv_show(target_obj, names=[model.name])
 
-        url = "http://localhost:32323"
-        print(f"✅ Sent to YACV (Check your browser, at {url})")
-        webbrowser.open(url)
-        input("✅ Press Enter to exit...")
-        return True
-    except Exception as e:
-        print(f"⚠️ Failed to connect to YACV: {e}")
-        return False
+    url = "http://localhost:32323"
+    print(f"✅ Sent to YACV (Check your browser, at {url})")
+
+    if not (webbrowser.open(url) or force):
+        return False  # Fallback
+    else:
+        get_logger(__name__).error("Browser unavailable.(try using fallback mode)")
+
+    input("✅ Press Enter to exit...")
+    return True
 
 
-
-def _export_stl_file(model):
+def _export_stl_file(model: Model) -> None:
     """
     Try exporting the specified model to a *.stl file.
+    Args:
+        model (Model): The model to export.
     """
     filename = f"{model.name}.stl"
-
-    try:
-        bd.export_stl(model, filename)
-    except NameError:
-        import build123d as bd_fallback
-        bd_fallback.export_stl(model, filename)
-
-    import os
+    model.part = model.wrap_result(model.part) # Necessary: wrap everything into compound.
+    bd.export_stl(model.part, filename)
     abs_path = os.path.abspath(filename)
     print(f"💾 Saved: {abs_path}")
-    print("👉 You can open this file with Windows 3D Viewer.")
+    print("👉 You can open this file with 3D Viewer Applications.")
 
-    try:
-        os.startfile(abs_path)
-    except:
-        pass
+    os.startfile(abs_path)
+    return
 
 def show(model: Model, mode: Literal['fallback', 'yacv', 'export'] = "fallback") -> None:
     """
     Visualize the specified model.
     Args:
-        model (Model): The model to visualize
+        model (Model): The model to visualize.
         mode (Literal['fallback', 'yacv', 'export'] = "fallback"): The method of visualization.
             "Fallback": to export the file when YACV is unavailable.
             "yacv": to visualize the model via Yet Another CAD Viewer.
             "export": to export the model to a *.stl file.
     """
-    print(f"👀 Processing: {model.name}")
+    get_logger(__name__).info(f"Processing model: {model.name}")
     match mode:
         case "fallback":
-            if not _show_yacv_model(model):
-                print("⚠️ Viewer not available. Exporting to disk...")
+            if not _show_yacv_model(model, force=False):
+                get_logger(__name__).warning("Viewer not available. Exporting to disk...")
                 _export_stl_file(model)
         case "yacv":
-            _show_yacv_model(model)
+            _show_yacv_model(model, force=True)
         case "export":
             _export_stl_file(model)
-        case _:
-            raise ValueError("❌ Invalid visualization method.\nCan be: \n\tfallback, yacv, export.")
 
-
+    return

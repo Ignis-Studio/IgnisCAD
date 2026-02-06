@@ -7,43 +7,43 @@ from igniscad.core import Entity
 import build123d as bd
 
 
-def Box(x, y, z, name=None) -> Entity:
+def Box(x: int, y: int, z: int, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Box
     Args:
-        x: X coordinate
-        y: Y coordinate
-        z: Z coordinate
-        name: name of the Entity in context registry
+        x (int): X coordinate
+        y (int): Y coordinate
+        z (int): Z coordinate
+        name (str): name of the Entity in context registry
     """
     return Entity(bd.Part(bd.Box(x, y, z, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER))), name)
 
-def Cylinder(r, h, name=None) -> Entity:
+def Cylinder(r: int, h: int, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Cylinder
     Args:
-        r: radius
-        h: height
-        name: name of the Entity in context registry
+        r (int): radius
+        h (int): height
+        name (str): name of the Entity in context registry
     """
     return Entity(bd.Part(bd.Cylinder(radius=r, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER))), name)
 
-def Sphere(r, name=None) -> Entity:
+def Sphere(r: int, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Sphere
     Args:
-        r: radius
-        name: name of the Entity in context registry
+        r (int): radius
+        name (str): name of the Entity in context registry
     """
     return Entity(bd.Part(bd.Sphere(radius=r)), name)
 
-def Torus(major, minor, name=None) -> Entity:
+def Torus(major: int, minor: int, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Torus
     Args:
-        major: major radius
-        minor: minor radius
-        name: name of the Entity in context registry
+        major (int): major radius
+        minor (int): minor radius
+        name (str): name of the Entity in context registry
     """
     return Entity(bd.Part(bd.Torus(major_radius=major, minor_radius=minor)), name)
 

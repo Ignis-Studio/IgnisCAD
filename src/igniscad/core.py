@@ -41,7 +41,7 @@ class Entity(AlignmentMixin):
         return Entity(p, self.name)
 
     # Set-like operations
-    def _wrap_result(self, res):
+    def wrap_result(self, res):
         """
         Inner helper function to wrap the result into a *single* build123d object.
         The *show()* function require a single Compound or Solid object to save the .stl file.
@@ -52,12 +52,12 @@ class Entity(AlignmentMixin):
 
     # Overriding the operators.
     def __sub__(self, other):
-        return self._wrap_result(self.part - other.part)
+        return self.wrap_result(self.part - other.part)
 
     def __add__(self, other):
-        return self._wrap_result(self.part + other.part)
+        return self.wrap_result(self.part + other.part)
 
     def __and__(self, other):
-        return self._wrap_result(self.part & other.part)
+        return self.wrap_result(self.part & other.part)
 
 

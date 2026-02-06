@@ -11,7 +11,7 @@ class AlignmentMixin:
     @property
     def bbox(self):
         """Grabbing the bounding box of the entity."""
-        return self._wrap_result(self.part).bounding_box()
+        return self.wrap_result(self.part).bounding_box()
 
     @property
     def top(self):
