@@ -1,6 +1,7 @@
 [project]
 name = "igniscad"
 version = "0.2.1"
+license = { file = "LICENSE" }
 description = "A wrapper for the build123d library, designed for AI agents."
 readme = "README.md"
 authors = [
@@ -11,6 +12,11 @@ requires-python = ">=3.11"
 dependencies = [
     "build123d<0.10",
     "yacv-server>=0.9.7",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License", 
+    "Operating System :: OS Independent",
 ]
 
 [build-system]
