@@ -48,7 +48,9 @@ def _export_stl_file(model: Model) -> None:
     print(f"💾 Saved: {abs_path}")
     print("👉 You can open this file with 3D Viewer Applications.")
 
-    os.startfile(abs_path)
+    from contextlib import suppress
+    with suppress(Exception):
+        os.startfile(abs_path)
     return
 
 def show(model: Model, mode: Literal['fallback', 'yacv', 'export'] = "fallback") -> None:

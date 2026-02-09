@@ -28,7 +28,7 @@ class Entity(AlignmentMixin):
         """
         Move the entity to a specific position.
         """
-        return Entity(self.part.moved(bd.Location((x, y, z))), self.name)
+        return Entity(bd.Part((self.part.moved(bd.Location((x, y, z))),)), self.name)
 
     def rotate(self, x=0, y=0, z=0):
         """
@@ -41,7 +41,8 @@ class Entity(AlignmentMixin):
         return Entity(p, self.name)
 
     # Set-like operations
-    def wrap_result(self, res):
+    @staticmethod
+    def wrap_result(res):
         """
         Inner helper function to wrap the result into a *single* build123d object.
         The *show()* function require a single Compound or Solid object to save the .stl file.

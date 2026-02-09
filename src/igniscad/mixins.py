@@ -3,14 +3,20 @@ Mixin classes.
 Contains Syntactic Sugar and Syntactic Properties.
 """
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from igniscad.core import Entity
+
 class AlignmentMixin:
     """
-    A mixin of class Entity, specified to calculate alimentation, bounding box and position.
+    A mixin of class Entity, specified to calculate alignment, bounding box and position.
     """
     # Syntactic properties
     @property
     def bbox(self):
         """Grabbing the bounding box of the entity."""
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
         return self.wrap_result(self.part).bounding_box()
 
     @property
@@ -93,6 +99,8 @@ class AlignmentMixin:
         dy = dest_y - curr_y
         dz = dest_z - curr_z
 
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
         return self.move(dx, dy, dz)
 
     # Syntactic Sugar for AI agents
