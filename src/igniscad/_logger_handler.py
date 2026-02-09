@@ -10,6 +10,7 @@ def setup(identifier: str) -> None:
     """
     Used in *__init__.py* when the package is imported.
     Initialize the global logger.
+
     Args:
         identifier (str): __name__ of the package.
     """

@@ -15,6 +15,7 @@ init_sub_logger(__name__)
 def _show_yacv_model(model: Model, force: bool) -> bool:
     """
     Try connecting Yet Another CAD Viewer (within the browser).
+
     Args:
         model (Model): The model to visualize.
         force (bool): whether to fallback or not.
@@ -38,6 +39,7 @@ def _show_yacv_model(model: Model, force: bool) -> bool:
 def _export_stl_file(model: Model) -> None:
     """
     Try exporting the specified model to a *.stl file.
+
     Args:
         model (Model): The model to export.
     """
@@ -56,6 +58,7 @@ def _export_stl_file(model: Model) -> None:
 def show(model: Model, mode: Literal['fallback', 'yacv', 'export'] = "fallback") -> None:
     """
     Visualize the specified model.
+
     Args:
         model (Model): The model to visualize.
         mode (Literal['fallback', 'yacv', 'export'] = "fallback"): The method of visualization.

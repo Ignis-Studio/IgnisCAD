@@ -10,7 +10,8 @@ import build123d as bd
 
 def Box(x: float, y: float, z: float, name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Box
+    Wrapped function for build123d.Box.
+
     Args:
         x (float): X coordinate
         y (float): Y coordinate
@@ -22,7 +23,8 @@ def Box(x: float, y: float, z: float, name: str = None) -> Entity:
 
 def Cylinder(r: float, h: float, name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Cylinder
+    Wrapped function for build123d.Cylinder.
+
     Args:
         r (float): radius
         h (float): height
@@ -33,7 +35,8 @@ def Cylinder(r: float, h: float, name: str = None) -> Entity:
 
 def Sphere(r: float, name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Sphere
+    Wrapped function for build123d.Sphere.
+
     Args:
         r (float): radius
         name (str): name of the Entity in context registry
@@ -43,7 +46,8 @@ def Sphere(r: float, name: str = None) -> Entity:
 
 def Torus(major: float, minor: float, name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Torus
+    Wrapped function for build123d.Torus.
+
     Args:
         major (float): major radius
         minor (float): minor radius
@@ -54,7 +58,8 @@ def Torus(major: float, minor: float, name: str = None) -> Entity:
 
 def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Cone
+    Wrapped function for build123d.Cone.
+
     Args:
         bottom_radius (float): bottom radius
         top_radius (float): top radius
@@ -67,7 +72,8 @@ def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) ->
 def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ymax: float, ymin: float,
           name: str = None) -> Entity:
     """
-    Wrapped function for build123d.Wedge
+    Wrapped function for build123d.Wedge.
+
     Args:
         xsize (float): Base width (X)
         ysize (float): Base depth (Y)
@@ -87,6 +93,7 @@ def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ym
 def Slot(w: float, h: float, d: float, name: str = None) -> Entity:
     """
     Wrapped function for a 3D slot.
+
     Args:
         w (float): slot width on the 2D sketch plane
         h (float): slot height on the 2D sketch plane
@@ -104,6 +111,7 @@ def CounterBoreHole(radius: float, cb_radius: float, cb_depth: float, height: fl
     """
     Creates a counter-bore hole shape (for boolean subtraction).
     AI description: A hole for a socket head cap screw.
+
     Args:
         radius (float): Through-hole radius (for the screw shaft)
         cb_radius (float): Counter-bore radius (for the screw head)
@@ -131,6 +139,7 @@ def CountersinkHole(radius: float, csk_radius: float, csk_angle: float, height: 
     """
     Creates a countersink hole shape (for boolean subtraction).
     AI description: A hole for a countersunk screw.
+
     Args:
         radius (float): Through-hole radius
         csk_radius (float): Countersink top radius
@@ -160,6 +169,7 @@ def CountersinkHole(radius: float, csk_radius: float, csk_angle: float, height: 
 def ISO_Hole(size: str, depth: float, fit: str = "Normal", name: str = None) -> Entity:
     """
     Creates a standard ISO metric screw clearance hole.
+
     Args:
         size (str): "M2", "M3", "M4", "M5", "M6", "M8", "M10", "M12"
         depth (float): Depth of the hole
