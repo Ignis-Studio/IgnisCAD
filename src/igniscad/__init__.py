@@ -9,7 +9,8 @@ wrap_handlers() # Apply the error handler patch.
 setup(__name__)
 
 __all__ = ['Model', 'Group', # Containers
-           'Box', 'Sphere', 'Cylinder', 'Torus', # Primitives
+           'Box', 'Sphere', 'Cylinder', 'Torus', "Slot", "ISO_Hole", "CounterBoreHole", "CountersinkHole", # Primitives
            'show', # Visualization
-           'AlignmentMixin' # Mixins
+           'AlignmentMixin', # Mixins
+           'Entity' # Base wrapper
         ]

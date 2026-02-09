@@ -9,9 +9,15 @@ class Model(Entity):
     A context manager to capture generated models(Entity objects).
     """
 
-    def __init__(self, name):
+    def __init__(self, name: str) -> None:
+        """
+        Args:
+            name (str): name of the Group in context registry
+        """
         super().__init__(part=None, name=name)
         self.registry = {}
+        # Calling transforming functions right after initialization may cause an AttributeError
+        # That is WAI.
 
     # Context manager for *with* statements.
     def __enter__(self):

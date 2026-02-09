@@ -53,12 +53,12 @@ class Entity(AlignmentMixin):
 
     # Overriding the operators.
     def __sub__(self, other):
-        return self.wrap_result(self.part - other.part)
+        return Entity(bd.Part(self.wrap_result(self.part - other.part)))
 
     def __add__(self, other):
-        return self.wrap_result(self.part + other.part)
+        return Entity(bd.Part(self.wrap_result(self.part + other.part)))
 
     def __and__(self, other):
-        return self.wrap_result(self.part & other.part)
+        return Entity(bd.Part(self.wrap_result(self.part & other.part)))
 
 
