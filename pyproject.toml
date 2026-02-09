@@ -1,6 +1,6 @@
 [project]
 name = "igniscad"
-version = "0.2.1"
+version = "0.2.2"
 license = { file = "LICENSE" }
 description = "A wrapper for the build123d library, designed for AI agents."
 readme = "README.md"
