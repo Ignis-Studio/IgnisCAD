@@ -1,0 +1,45 @@
+site_name: Ignis CAD
+site_url: https://Ignis-Studio.github.io/igniscad/
+repo_url: https://github.com/Ignis-Studio/igniscad/
+repo_name: Ignis-Studio/igniscad
+
+theme:
+  name: material
+  features:
+    - navigation.tabs # 顶部导航栏
+    - navigation.sections # 侧边栏分组
+    - content.code.copy # 代码块复制按钮
+    - content.action.edit # 允许用户编辑页面
+  palette: 
+    # 切换亮色/暗色模式的按钮
+    - scheme: default
+      primary: teal
+      accent: purple
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: teal
+      accent: lime
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings: # 自动提取 Python 代码注释的核心插件
+      handlers:
+        python:
+          paths: [.] 
+  - include-markdown:
+      rewrite_relative_urls: true
+
+markdown_extensions:
+  - pymdownx.highlight: # 代码高亮
+      anchor_linenums: true
+  - pymdownx.superfences # 支持复杂的代码块嵌套
+  - admonition # 支持提示框 (Tip, Warning)
+  
+nav:
+  - Home: index.md
+  - API Reference: api.md
