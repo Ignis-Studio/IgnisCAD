@@ -6,8 +6,10 @@
 
 ## IgnisCAD
 
-[![GitHub license](https://img.shields.io/github/license/Ignis-Studio/IgnisCAD)](https://github.com/Ignis-Studio/IgnisCAD/blob/main/LICENSE)
-[![PyPI downloads](https://img.shields.io/pypi/dm/igniscad)](https://pypi.org/project/igniscad)
+[![PyPI version](https://img.shields.io/pypi/v/igniscad.svg)](https://pypi.org/project/igniscad/)
+[![Python versions](https://img.shields.io/pypi/pyversions/igniscad.svg)](https://pypi.org/project/igniscad/)
+[![License](https://img.shields.io/pypi/l/igniscad.svg)](https://github.com/CreeperIsASpy/igniscad/blob/main/LICENSE)
+[![Downloads](https://static.pepy.tech/badge/igniscad)](https://pepy.tech/project/igniscad)
 
 使用 Python 封装 build123d 进行 CAD 开发，让 AI 智能体可以使用纯文本建模。  
 *A wrapper for the build123d library, designed for AI agents.*  
