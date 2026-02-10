@@ -25,14 +25,15 @@ def _show_yacv_model(model: Model, force: bool) -> bool:
     yacv_show(target_obj, names=[model.name])
 
     url = "http://localhost:32323"
-    print(f"✅ Sent to YACV (Check your browser, at {url})")
+    print(f"Sent to YACV (open in your browser): {url}")
 
-    if not (webbrowser.open(url) or force):
+    opened = webbrowser.open(url)
+    if not opened and not force:
         return False  # Fallback
-    else:
-        get_logger(__name__).error("Browser unavailable.(try using fallback mode)")
+    if not opened and force:
+        get_logger(__name__).warning("Browser unavailable (try using fallback mode)")
 
-    input("✅ Press Enter to exit...")
+    input("Press Enter to exit...")
     return True
 
 
@@ -47,8 +48,8 @@ def _export_stl_file(model: Model) -> None:
     model.part = model.wrap_result(model.part) # Necessary: wrap everything into compound.
     bd.export_stl(model.part, filename)
     abs_path = os.path.abspath(filename)
-    print(f"💾 Saved: {abs_path}")
-    print("👉 You can open this file with 3D Viewer Applications.")
+    print(f"Saved: {abs_path}")
+    print("You can open this file with 3D viewer applications.")
 
     from contextlib import suppress
     with suppress(Exception):
