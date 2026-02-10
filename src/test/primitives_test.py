@@ -15,7 +15,7 @@ with Model("HoleTestBlock") as model:
         height=base_height,
         name="cb_feature"
     )
-    cb_hole = cb_hole.move(-25, 0, 0)
+    cb_hole = cb_hole.move(x=-25)
 
     print(">>> Agent: Designing Countersink Hole (M4 90deg)...")
     csk_hole = CountersinkHole(
@@ -25,14 +25,15 @@ with Model("HoleTestBlock") as model:
         height=base_height,
         name="csk_feature"
     )
-    csk_hole = csk_hole.move(25, 0, 0)
+    csk_hole = csk_hole.move(x=25)
+
+    slot = Slot(38, 2, base_height, name="Slot").move(x=10).rotate(z=90).behind(base, offset=-38)
 
     print(">>> Agent: Performing boolean cuts...")
     final_shape = base - cb_hole - csk_hole
-    model << final_shape
+    model << final_shape - slot
 
     calculated_csk_depth = (4.5 - 2.2) / math.tan(math.radians(90 / 2))
     print(f">>> Agent Insight: The calculated depth for the 90° Countersink cone is {calculated_csk_depth:.2f}mm")
 
-# 显示模型
 show(model)

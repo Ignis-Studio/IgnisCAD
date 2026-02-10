@@ -13,13 +13,15 @@ As there will be only one Model in the context, so the function always gives the
 
 import build123d as bd
 from igniscad.mixins import AlignmentMixin
+from typing import Union
+
 
 class Entity(AlignmentMixin):
     """
     A base class for every wrapped build123d objects.
     The original build123d objects can be called with entity.part .
     """
-    def __init__(self, part: bd.Part | None, name=None):
+    def __init__(self, part: Union[bd.BasePartObject, bd.BaseSketchObject, bd.Part, bd.Face] | None, name=None):
         self.part = part
         self.name = name
 

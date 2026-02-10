@@ -18,7 +18,7 @@ def Box(x: float, y: float, z: float, name: str = None) -> Entity:
         z (float): Z coordinate
         name (str): name of the Entity in context registry
     """
-    return Entity(bd.Part(bd.Box(x, y, z, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER))), name)
+    return Entity(bd.Box(x, y, z, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
 def Cylinder(r: float, h: float, name: str = None) -> Entity:
@@ -30,7 +30,7 @@ def Cylinder(r: float, h: float, name: str = None) -> Entity:
         h (float): height
         name (str): name of the Entity in context registry
     """
-    return Entity(bd.Part(bd.Cylinder(radius=r, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER))), name)
+    return Entity(bd.Cylinder(radius=r, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
 def Sphere(r: float, name: str = None) -> Entity:
@@ -41,7 +41,7 @@ def Sphere(r: float, name: str = None) -> Entity:
         r (float): radius
         name (str): name of the Entity in context registry
     """
-    return Entity(bd.Part(bd.Sphere(radius=r)), name)
+    return Entity(bd.Sphere(radius=r), name)
 
 
 def Torus(major: float, minor: float, name: str = None) -> Entity:
@@ -53,7 +53,7 @@ def Torus(major: float, minor: float, name: str = None) -> Entity:
         minor (float): minor radius
         name (str): name of the Entity in context registry
     """
-    return Entity(bd.Part(bd.Torus(major_radius=major, minor_radius=minor)), name)
+    return Entity(bd.Torus(major_radius=major, minor_radius=minor), name)
 
 
 def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) -> Entity:
@@ -66,7 +66,7 @@ def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) ->
         h (float): height
         name (str): name of the Entity in context registry
     """
-    return Entity(bd.Part(bd.Cone(bottom_radius=bottom_radius, top_radius=top_radius, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER))), name)
+    return Entity(bd.Cone(bottom_radius=bottom_radius, top_radius=top_radius, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
 def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ymax: float, ymin: float,
@@ -87,7 +87,7 @@ def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ym
         In build123d, the *zmax* and *zmin* params control the Y direction, which can be confusing.
         They are re-mapped to *ymax* and *ymin* here for clarity.
     """
-    return Entity(bd.Part(bd.Wedge(xsize=xsize, ysize=ysize, zsize=zsize, xmax=xmax, xmin=xmin, zmax=ymax, zmin=ymin)), name)
+    return Entity(bd.Wedge(xsize=xsize, ysize=ysize, zsize=zsize, xmax=xmax, xmin=xmin, zmax=ymax, zmin=ymin), name)
 
 
 def Slot(w: float, h: float, d: float, name: str = None) -> Entity:
@@ -96,11 +96,11 @@ def Slot(w: float, h: float, d: float, name: str = None) -> Entity:
 
     Args:
         w (float): slot width on the 2D sketch plane
-        h (float): slot height on the 2D sketch plane
+        h (float): slot height on the 2D sketch plane(diameter)
         d (float): slot depth (extrusion amount)
         name (str): name of the Entity in context registry
     """
-    slot_sketch = bd.Sketch(bd.Slot(width=w, height=h))
+    slot_sketch = bd.Sketch(bd.SlotOverall(width=w, height=h / 2))
     # Extrude in both directions from the sketch plane to center the part
     part = bd.extrude(slot_sketch, amount=d / 2, both=True)
 
@@ -198,4 +198,3 @@ def ISO_Hole(size: str, depth: float, fit: str = "Normal", name: str = None) -> 
     radius = diameter / 2
 
     return Cylinder(r=radius, h=depth, name=name)
-
