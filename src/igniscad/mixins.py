@@ -2,7 +2,7 @@
 Mixin classes.
 Contains Syntactic Sugar and Syntactic Properties.
 """
-
+import build123d as bd
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from igniscad.core import Entity
@@ -122,3 +122,95 @@ class AlignmentMixin:
 
     def behind(self, target, offset=0):
         return self.align(target, "back", offset)
+
+class ModificationMixin:
+    """
+    A mixin of class Entity, specified to perform modification operations.
+    """
+    def fillet(self, radius, edges=None):
+        """
+        Fillets the edges of the entity.
+
+        Args:
+            radius (float): The radius of the fillet.
+            edges (list, optional): A list of edges to fillet. If None, all edges are filleted. Defaults to None.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+        
+        edges_to_fillet = edges
+        if edges_to_fillet is None:
+            edges_to_fillet = self.part.edges()
+        
+        new_part = self.part.fillet(radius, edge_list=edges_to_fillet)
+        return self.__class__(self.wrap_result(new_part), self.name)
+
+    def chamfer(self, distance, edges=None):
+        """
+        Chamfers the edges of the entity.
+
+        Args:
+            distance (float): The distance of the chamfer.
+            edges (list, optional): A list of edges to chamfer. If None, all edges are chamfered. Defaults to None.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+
+        edges_to_chamfer = edges
+        if edges_to_chamfer is None:
+            edges_to_chamfer = self.part.edges()
+
+        new_part = self.part.chamfer(distance, distance, edge_list=edges_to_chamfer)
+        return self.__class__(self.wrap_result(new_part), self.name)
+
+    def shell(self):
+        """
+        Creates a shell of the entity.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+
+        shell_obj = self.part.shell()
+        
+        return self.__class__(shell_obj, self.name)
+
+    def offset(self, distance, kind=bd.Kind.ARC):
+        """
+        Offsets the entity.
+
+        Args:
+            distance (float): The distance to offset.
+            kind (str, optional): The kind of offset to perform. Defaults to 'arc'.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+
+        try:
+            new_part = bd.offset(self.part, amount=distance, kind=kind)
+        except RuntimeError as e:
+            if "Unexpected result type" in str(e):
+                # This error can happen with complex sketches like text, where offsetting
+                # a character results in a shape that build123d doesn't expect.
+                # The workaround is to offset each face of the compound individually
+                # and combine the results, skipping any faces that fail to offset.
+                all_faces = self.part.faces()
+                offset_faces = []
+                for face in all_faces:
+                    try:
+                        # Each face of a text object is a letter.
+                        offset_result = bd.offset(face, amount=distance, kind=kind)
+                        if isinstance(offset_result, bd.Face):
+                            offset_faces.append(offset_result)
+                        elif isinstance(offset_result, bd.Compound):
+                            offset_faces.extend(offset_result.faces())
+                    except RuntimeError:
+                        pass
+
+                if not offset_faces:
+                    raise RuntimeError("Offset operation failed for all faces.") from e
+
+                new_part = bd.Sketch(offset_faces)
+            else:
+                raise e
+
+        return self.__class__(self.wrap_result(new_part), self.name)
