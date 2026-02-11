@@ -4,18 +4,17 @@ Every container is a context manager.
 """
 from igniscad.core import Entity
 
-class Model(Entity):
+class BaseContainer(Entity):
     """
-    A context manager to capture generated models(Entity objects).
+    The base class of all containers.
+    Supports the context manager syntax and overrides the "<<" operator to capture models.
     """
-
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str):
         """
         Args:
-            name (str): name of the Group in context registry
+            name (str): name of the Group in context registry.
         """
         super().__init__(part=None, name=name)
-        self.registry = {}
         # Calling transforming functions right after initialization may cause an AttributeError
         # That is WAI.
 
@@ -28,10 +27,30 @@ class Model(Entity):
             self.part.label = self.name  # names as labels
         return
 
+    def __lshift__(self, other):
+        """
+        Override the "<<" operator.
+        Must be inherited in subclasses.
+        """
+        pass
+
+class Model(BaseContainer):
+    """
+    A context manager to capture generated models(Entity objects).
+    """
+
+    def __init__(self, name: str) -> None:
+        """
+        Args:
+            name (str): name of the Group in context registry.
+        """
+        super().__init__(name=name)
+        self.registry = {}
+
     # Operator overriding
     def __lshift__(self, other):
         """
-        Override the "<<" operator
+        Override the "<<" operator.
         Usage: model << Entity(...)
         """
         if isinstance(other, Entity):
@@ -61,7 +80,7 @@ class Model(Entity):
     def f(self, name: str):
         return self.find(name)
 
-class Group(Entity):
+class Group(BaseContainer):
     """
     Combine multiple entities into a single Group Entity.
     Support the same context-manager syntax (as Model does).
@@ -72,22 +91,13 @@ class Group(Entity):
     def __init__(self, name=None):
         """
         Args:
-            name: name of the Group in context registry
+            name: name of the Group in context registry.
         """
-        super().__init__(part=None, name=name)
-        # Calling transforming functions right after initialization may cause an AttributeError
-        # That is WAI.
-
-    # Context manager for *with* statements.
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        return
+        super().__init__(name=name)
 
     def __lshift__(self, other):
         """
-        Override the "<<" operator
+        Override the "<<" operator.
         Usage: group << Entity(...)
 
         Every entity added is unioned automatically.
