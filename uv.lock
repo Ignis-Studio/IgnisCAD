@@ -500,6 +500,7 @@ docs = [
     { name = "mkdocstrings", extras = ["python"], specifier = ">=1.0.3" },
 ]
 test = [{ name = "pytest", specifier = ">=8.3.0" }]
+tests = []
 
 [[package]]
 name = "iniconfig"
