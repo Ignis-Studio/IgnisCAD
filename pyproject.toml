@@ -34,3 +34,6 @@ docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",
 ]
+test = [
+    "pytest>=8.3.0",
+]
