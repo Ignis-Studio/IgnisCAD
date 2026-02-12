@@ -4,8 +4,30 @@ Contains Syntactic Sugar and Syntactic Properties.
 """
 import build123d as bd
 from typing import TYPE_CHECKING
+
+from igniscad.selectors import FaceSelector, EdgeSelector, VertexSelector
+
 if TYPE_CHECKING:
     from igniscad.core import Entity
+
+class EntitySelectorMixin:
+    """
+    A mixin for Entity to provide selection methods.
+    """
+    def faces(self):
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+        return FaceSelector(self.part.faces(), parent=self)
+
+    def edges(self):
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+        return EdgeSelector(self.part.edges(), parent=self)
+
+    def vertices(self):
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+        return VertexSelector(self.part.vertices(), parent=self)
 
 class AlignmentMixin:
     """
@@ -142,8 +164,10 @@ class ModificationMixin:
         if edges_to_fillet is None:
             edges_to_fillet = self.part.edges()
         
-        new_part = self.part.fillet(radius, edge_list=edges_to_fillet)
-        return self.__class__(self.wrap_result(new_part), self.name)
+        # Convert primitive to a generic Solid by using its .wrapped property
+        part_as_solid = bd.Solid(self.part.wrapped)
+        new_part = part_as_solid.fillet(radius, edge_list=edges_to_fillet)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags)
 
     def chamfer(self, distance, edges=None):
         """
@@ -160,8 +184,10 @@ class ModificationMixin:
         if edges_to_chamfer is None:
             edges_to_chamfer = self.part.edges()
 
-        new_part = self.part.chamfer(distance, distance, edge_list=edges_to_chamfer)
-        return self.__class__(self.wrap_result(new_part), self.name)
+        # Convert primitive to a generic Solid by using its .wrapped property
+        part_as_solid = bd.Solid(self.part.wrapped)
+        new_part = part_as_solid.chamfer(distance, distance, edge_list=edges_to_chamfer)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags)
 
     def shell(self):
         """
@@ -172,7 +198,7 @@ class ModificationMixin:
 
         shell_obj = self.part.shell()
         
-        return self.__class__(shell_obj, self.name)
+        return self.__class__(shell_obj, self.name, self.tags)
 
     def offset(self, distance, kind=bd.Kind.ARC):
         """
@@ -213,4 +239,4 @@ class ModificationMixin:
             else:
                 raise e
 
-        return self.__class__(self.wrap_result(new_part), self.name)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags)

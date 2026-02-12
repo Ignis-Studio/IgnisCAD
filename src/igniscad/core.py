@@ -12,25 +12,38 @@ As there will be only one Model in the context, so the function always gives the
 """
 
 import build123d as bd
-from igniscad.mixins import AlignmentMixin, ModificationMixin
+from igniscad.mixins import AlignmentMixin, ModificationMixin, EntitySelectorMixin
 from typing import Union
+from collections import defaultdict
 
 
-class Entity(AlignmentMixin, ModificationMixin):
+class Entity(AlignmentMixin, ModificationMixin, EntitySelectorMixin):
     """
     A base class for every wrapped build123d objects.
     The original build123d objects can be called with entity.part .
     """
-    def __init__(self, part: Union[bd.BasePartObject, bd.BaseSketchObject, bd.Part, bd.Face, bd.Shape] | None, name=None):
+    def __init__(self, part: Union[bd.BasePartObject, bd.BaseSketchObject, bd.Part, bd.Face, bd.Shape] | None, name=None, tags=None):
         self.part = part
         self.name = name
+        self.tags = defaultdict(list)
+        if tags:
+            self.tags.update(tags)
+
+    def get_by_tag(self, tag: str):
+        """
+        Get a selector for objects with a given tag.
+        """
+        from igniscad.selectors import Selector
+        items = self.tags.get(tag, [])
+        return Selector(items, parent=self)
 
     # Transition logic
     def move(self, x=0, y=0, z=0):
         """
         Move the entity to a specific position.
         """
-        return self.__class__(self.wrap_result(self.part.moved(bd.Location((x, y, z)))), self.name)
+        new_part = self.wrap_result(self.part.moved(bd.Location((x, y, z))))
+        return self.__class__(new_part, self.name, self.tags)
 
     def rotate(self, x=0, y=0, z=0):
         """
@@ -40,7 +53,7 @@ class Entity(AlignmentMixin, ModificationMixin):
         if x: p = p.rotate(bd.Axis.X, x)
         if y: p = p.rotate(bd.Axis.Y, y)
         if z: p = p.rotate(bd.Axis.Z, z)
-        return self.__class__(p, self.name)
+        return self.__class__(p, self.name, self.tags)
 
     # Set-like operations
     @staticmethod
@@ -62,4 +75,3 @@ class Entity(AlignmentMixin, ModificationMixin):
 
     def __and__(self, other):
         return self.__class__(bd.Part(self.wrap_result(self.part & other.part)))
-

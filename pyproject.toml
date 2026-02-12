@@ -1,6 +1,6 @@
 [project]
 name = "igniscad"
-version = "0.2.2"
+version = "0.3.1"
 license = { file = "LICENSE" }
 description = "A wrapper for the build123d library, designed for AI agents."
 readme = "README.md"
@@ -34,7 +34,5 @@ docs = [
     "mkdocs-material>=9.7.1",
     "mkdocstrings[python]>=1.0.3",
 ]
-test = [
-    "pytest>=8.3.0",
-]
+test = []
 tests = []
