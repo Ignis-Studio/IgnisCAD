@@ -35,4 +35,3 @@ docs = [
     "mkdocstrings[python]>=1.0.3",
 ]
 test = []
-tests = []
