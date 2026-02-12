@@ -3,7 +3,6 @@ Pytest for the new selector features.
 """
 
 import pytest
-import build123d as bd
 from igniscad import Box, Entity
 
 @pytest.fixture
