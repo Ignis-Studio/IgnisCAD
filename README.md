@@ -35,7 +35,7 @@ and try adding or modifying some ***Entity*** inside it.*
 
 每个 *Entity* 在定义时都有一个 *name* 属性，您可以通过 *name* 属性来在模型中快速查找一个特定的 *Entity*。  
 *Each ***Entity*** has a ***name*** property while defining, 
-you can use the ***name*** property to find a specified ***Entity*** in the model immediately.  
+you can use the ***name*** property to find a specified ***Entity*** in the model immediately.*  
 这样可以保证上下文的统一性，也有助于进行原子性修改：  
 *This ensures the consistency of context and facilitates atomic modifications:*  
 ```python
