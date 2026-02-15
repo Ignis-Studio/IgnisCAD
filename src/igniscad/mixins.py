@@ -12,19 +12,49 @@ if TYPE_CHECKING:
 
 class EntitySelectorMixin:
     """
-    A mixin for Entity to provide selection methods.
+    A mixin for the Entity class that provides methods to initiate selections.
+
+    This mixin adds the .faces(), .edges(), and .vertices() methods to the
+    Entity class, which are the entry points for the fluent selection API.
     """
-    def faces(self):
+    def faces(self) -> FaceSelector:
+        """Selects all faces of the entity.
+
+        This method retrieves all faces from the underlying build123d part
+        and wraps them in a FaceSelector, enabling chainable filtering and
+        modification.
+
+        Returns:
+            FaceSelector: A selector containing all faces of the entity.
+        """
         if TYPE_CHECKING:
             assert isinstance(self, Entity)
         return FaceSelector(self.part.faces(), parent=self)
 
-    def edges(self):
+    def edges(self) -> EdgeSelector:
+        """Selects all edges of the entity.
+
+        This method retrieves all edges from the underlying build123d part
+        and wraps them in an EdgeSelector, enabling chainable filtering and
+        modification.
+
+        Returns:
+            EdgeSelector: A selector containing all edges of the entity.
+        """
         if TYPE_CHECKING:
             assert isinstance(self, Entity)
         return EdgeSelector(self.part.edges(), parent=self)
 
-    def vertices(self):
+    def vertices(self) -> VertexSelector:
+        """Selects all vertices of the entity.
+
+        This method retrieves all vertices from the underlying build123d part
+        and wraps them in a VertexSelector, enabling chainable filtering and
+        modification.
+
+        Returns:
+            VertexSelector: A selector containing all vertices of the entity.
+        """
         if TYPE_CHECKING:
             assert isinstance(self, Entity)
         return VertexSelector(self.part.vertices(), parent=self)
