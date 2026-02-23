@@ -92,3 +92,17 @@ def test_empty_selector(sample_box: Entity):
     assert len(empty_selector) == 0
     assert empty_selector.top().first is None
     assert empty_selector.sort_by_area().get() == []
+
+
+def test_face_touching(sample_box: Entity):
+    """Test the face_touching selector method."""
+    top_box = Box(10, 10, 10).move(x=0, y=0, z=10)
+    touched_faces_shape = sample_box.faces().face_intersecting(top_box).get()
+
+    assert len(touched_faces_shape) == 1
+    assert touched_faces_shape[0].center().Z == 5.0
+
+    far_box = Box(10, 10, 100).move(x=100, y=100, z=100)
+    no_touched_faces = sample_box.faces().face_intersecting(far_box).get()
+
+    assert len(no_touched_faces) == 0

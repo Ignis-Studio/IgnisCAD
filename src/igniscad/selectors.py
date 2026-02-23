@@ -14,6 +14,8 @@ from typing import Callable, Iterable, Union, Generic, TypeVar, TYPE_CHECKING
 import build123d as bd
 from enum import Enum
 
+from build123d import Face
+
 if TYPE_CHECKING:
     from igniscad.core import Entity
 
@@ -181,7 +183,7 @@ class FaceSelector(Selector[bd.Face]):
         bottom_face = min(self._items, key=lambda f: f.center().Z)
         return self.__class__([bottom_face], self.parent)
 
-    def sort_by_area(self, reverse: bool = False) -> "FaceSelector":
+    def sort_by_area(self, reverse: bool = False) -> Selector[Face]:
         """Sorts the faces by their surface area.
 
         Args:
@@ -192,6 +194,36 @@ class FaceSelector(Selector[bd.Face]):
             FaceSelector: A new selector with the faces sorted by area.
         """
         return self.sort_by(sort_key=lambda f: f.area, reverse=reverse)
+
+    def face_intersecting(self, other: Entity, tolerance: float = 1e-5) -> "FaceSelector":
+        """
+        Selects faces that physically overlap with a given shape (Area > 0).
+
+        Uses a boolean intersection to determine if the face shares a common
+        surface area with the target object. This excludes faces that only
+        touch at edges or corners.
+
+        Args:
+            other (Entity): The reference Entity to check against.
+            tolerance (float, optional): Minimum area to be considered intersecting.
+                Also used for the preliminary distance check. Defaults to 1e-5.
+
+        Returns:
+            FaceSelector: A new selector containing only the mating/overlapping faces.
+        """
+        if not self._items:
+            return self.__class__([], self.parent)
+
+        touching_faces = []
+        for face in self._items:
+            if face.distance_to(other.part) > tolerance:
+                continue
+
+            intersection = face & other.part
+            if intersection and intersection.area > tolerance:
+                touching_faces.append(face)
+
+        return self.__class__(touching_faces, self.parent)
 
     def fillet(self, radius: float) -> "Entity":
         """Applies a fillet to all edges of the selected faces.
