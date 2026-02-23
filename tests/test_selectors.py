@@ -95,7 +95,7 @@ def test_empty_selector(sample_box: Entity):
 
 
 def test_face_touching(sample_box: Entity):
-    """Test the face_touching selector method."""
+    """Test the face_intersecting selector method."""
     top_box = Box(10, 10, 10).move(x=0, y=0, z=10)
     touched_faces_shape = sample_box.faces().face_intersecting(top_box).get()
 
