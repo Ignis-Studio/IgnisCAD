@@ -16,6 +16,8 @@ from enum import Enum
 
 from build123d import Face
 
+from igniscad.helpers.constants import TOLERANCE
+
 if TYPE_CHECKING:
     from igniscad.core import Entity
 
@@ -195,7 +197,7 @@ class FaceSelector(Selector[bd.Face]):
         """
         return self.sort_by(sort_key=lambda f: f.area, reverse=reverse)
 
-    def face_intersecting(self, other: Entity, tolerance: float = 1e-5) -> "FaceSelector":
+    def face_intersecting(self, other: Entity, tolerance: float = TOLERANCE) -> "FaceSelector":
         """
         Selects faces that physically overlap with a given shape (Area > 0).
 
@@ -206,7 +208,7 @@ class FaceSelector(Selector[bd.Face]):
         Args:
             other (Entity): The reference Entity to check against.
             tolerance (float, optional): Minimum area to be considered intersecting.
-                Also used for the preliminary distance check. Defaults to 1e-5.
+                Also used for the preliminary distance check. Defaults to TOLERANCE.
 
         Returns:
             FaceSelector: A new selector containing only the mating/overlapping faces.

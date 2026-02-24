@@ -8,7 +8,7 @@ from typing import Literal
 import build123d as bd
 
 from igniscad import Model
-from igniscad._logger_handler import init_sub_logger, get_logger
+from igniscad.helpers.logger_handler import init_sub_logger, get_logger
 
 init_sub_logger(__name__)
 

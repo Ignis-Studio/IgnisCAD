@@ -5,10 +5,12 @@ from igniscad.primitives_2d import *
 from igniscad.selectors import Axis
 from igniscad.visualization import show
 
-from igniscad._err_handler import wrap_handlers
-from igniscad._logger_handler import setup
+from igniscad.helpers.err_handler import wrap_handlers
+from igniscad.helpers.logger_handler import setup
 wrap_handlers() # Apply the error handler patch.
 setup(__name__)
+
+from igniscad.helpers import exceptions
 
 __all__ = ['Model', 'Group', # Containers
            'Box', 'Sphere', 'Cylinder', 'Torus', "Slot", "ISO_Hole", "CounterBoreHole", "CountersinkHole", # Primitives
@@ -16,5 +18,6 @@ __all__ = ['Model', 'Group', # Containers
            'show', # Visualization
            'AlignmentMixin', # Mixins
            'Entity', # Base wrapper
-           'Axis' # Selector axis
+           'Axis', # Selector axis
+           'exceptions'
         ]

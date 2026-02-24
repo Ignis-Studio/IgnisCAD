@@ -5,9 +5,11 @@ Note: center aligning is defaulted for all primitives.
 
 import math
 from igniscad.core import Entity
+from igniscad.helpers.validator import validate_dimensions
 import build123d as bd
 
 
+@validate_dimensions("x", "y", "z")
 def Box(x: float, y: float, z: float, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Box.
@@ -21,6 +23,7 @@ def Box(x: float, y: float, z: float, name: str = None) -> Entity:
     return Entity(bd.Box(x, y, z, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
+@validate_dimensions("r", "h")
 def Cylinder(r: float, h: float, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Cylinder.
@@ -33,6 +36,7 @@ def Cylinder(r: float, h: float, name: str = None) -> Entity:
     return Entity(bd.Cylinder(radius=r, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
+@validate_dimensions("r")
 def Sphere(r: float, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Sphere.
@@ -44,6 +48,7 @@ def Sphere(r: float, name: str = None) -> Entity:
     return Entity(bd.Sphere(radius=r), name)
 
 
+@validate_dimensions("major", "minor")
 def Torus(major: float, minor: float, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Torus.
@@ -56,6 +61,7 @@ def Torus(major: float, minor: float, name: str = None) -> Entity:
     return Entity(bd.Torus(major_radius=major, minor_radius=minor), name)
 
 
+@validate_dimensions("bottom_radius", "top_radius", "h")
 def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) -> Entity:
     """
     Wrapped function for build123d.Cone.
@@ -69,6 +75,7 @@ def Cone(bottom_radius: float, top_radius: float, h: float, name: str = None) ->
     return Entity(bd.Cone(bottom_radius=bottom_radius, top_radius=top_radius, height=h, align=(bd.Align.CENTER, bd.Align.CENTER, bd.Align.CENTER)), name)
 
 
+@validate_dimensions("xsize", "ysize", "zsize", "xmax", "xmin", "ymax", "ymin")
 def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ymax: float, ymin: float,
           name: str = None) -> Entity:
     """
@@ -83,6 +90,7 @@ def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ym
         ymax (float): Y coordinate of the top face end (mapped to build123d zmax)
         ymin (float): Y coordinate of the top face start (mapped to build123d zmin)
         name (str): name of the Entity in context registry
+
     Note:
         In build123d, the *zmax* and *zmin* params control the Y direction, which can be confusing.
         They are re-mapped to *ymax* and *ymin* here for clarity.
@@ -90,6 +98,7 @@ def Wedge(xsize: float, ysize: float, zsize: float, xmax: float, xmin: float, ym
     return Entity(bd.Wedge(xsize=xsize, ysize=ysize, zsize=zsize, xmax=xmax, xmin=xmin, zmax=ymax, zmin=ymin), name)
 
 
+@validate_dimensions("w", "h", "d")
 def Slot(w: float, h: float, d: float, name: str = None) -> Entity:
     """
     Wrapped function for a 3D slot.
@@ -107,6 +116,7 @@ def Slot(w: float, h: float, d: float, name: str = None) -> Entity:
     return Entity(part, name)
 
 
+@validate_dimensions("radius", "cb_radius", "cb_depth", "height")
 def CounterBoreHole(radius: float, cb_radius: float, cb_depth: float, height: float, name: str = None) -> Entity:
     """
     Creates a counter-bore hole shape (for boolean subtraction).
@@ -135,6 +145,7 @@ def CounterBoreHole(radius: float, cb_radius: float, cb_depth: float, height: fl
     return Entity(combined_part, name)
 
 
+@validate_dimensions("radius", "csk_radius", "csk_angle", "height")
 def CountersinkHole(radius: float, csk_radius: float, csk_angle: float, height: float, name: str = None) -> Entity:
     """
     Creates a countersink hole shape (for boolean subtraction).

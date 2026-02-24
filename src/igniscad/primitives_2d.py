@@ -3,10 +3,13 @@
 """
 
 import build123d as bd
+
+from igniscad.helpers.validator import validate_dimensions, validate_vertices
 from igniscad.core import Entity
 
 # 2D Primitives
 
+@validate_dimensions("x", "y")
 def Rectangle(x: float, y: float, name: str = None) -> Entity:
     """
     Creates a 2D rectangle sketch.
@@ -19,6 +22,8 @@ def Rectangle(x: float, y: float, name: str = None) -> Entity:
     sketch = bd.Rectangle(x, y)
     return Entity(sketch, name)
 
+
+@validate_dimensions("r")
 def Circle(r: float, name: str = None) -> Entity:
     """
     Creates a 2D circle sketch.
@@ -30,6 +35,8 @@ def Circle(r: float, name: str = None) -> Entity:
     sketch = bd.Circle(r)
     return Entity(sketch, name)
 
+
+@validate_vertices
 def Polygon(*points, name: str = None) -> Entity:
     """
     Creates a 2D polygon from a list of points.
@@ -41,6 +48,7 @@ def Polygon(*points, name: str = None) -> Entity:
     sketch = bd.Polygon(*points)
     return Entity(sketch, name)
 
+@validate_dimensions("font_size")
 def Text(txt: str, font_size: float, font: str = "Arial", name: str = None) -> Entity:
     """
     Creates a 2D text sketch.
@@ -56,7 +64,7 @@ def Text(txt: str, font_size: float, font: str = "Arial", name: str = None) -> E
 
 
 # 3D Operations from 2D Sketches
-
+@validate_dimensions("amount")
 def Extrude(sketch: Entity, amount: float, name: str = None) -> Entity:
     """
     Extrudes a 2D sketch into a 3D part.
@@ -72,6 +80,7 @@ def Extrude(sketch: Entity, amount: float, name: str = None) -> Entity:
     part = bd.extrude(sketch.part, amount=amount)
     return Entity(part, name)
 
+
 def Revolve(sketch: Entity, axis: bd.Axis = bd.Axis.X, name: str = None) -> Entity:
     """
     Revolves a 2D sketch around an axis to create a 3D part.
@@ -86,6 +95,7 @@ def Revolve(sketch: Entity, axis: bd.Axis = bd.Axis.X, name: str = None) -> Enti
 
     part = bd.revolve(sketch.part, axis=axis)
     return Entity(part, name)
+
 
 def Sweep(sketch: Entity, path: Entity, name: str = None) -> Entity:
     """

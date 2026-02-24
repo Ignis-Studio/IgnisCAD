@@ -1,15 +1,15 @@
 from pathlib import Path
 
-import igniscad as ic
+import igniscad as icad
 
 
 def test_show_export_creates_stl(tmp_path: Path, monkeypatch):
     monkeypatch.chdir(tmp_path)
 
-    with ic.Model("sample") as m:
-        m << ic.Box(8, 8, 8)
+    with icad.Model("sample") as m:
+        m << icad.Box(8, 8, 8)
 
-    ic.show(m, mode="export")
+    icad.show(m, mode="export")
 
     out = tmp_path / "sample.stl"
     assert out.exists()
