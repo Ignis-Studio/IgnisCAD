@@ -2,13 +2,41 @@
 Mixin classes.
 Contains Syntactic Sugar and Syntactic Properties.
 """
+from __future__ import annotations
+
 import build123d as bd
+from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
 from igniscad.selectors import FaceSelector, EdgeSelector, VertexSelector
 
 if TYPE_CHECKING:
     from igniscad.core import Entity
+
+
+@dataclass(frozen=True)
+class Joint:
+    """
+    A named alignment anchor attached to an Entity.
+
+    The location is stored relative to the owning entity so joints remain valid
+    after the entity is moved or rotated.
+    """
+    owner: "Entity"
+    location: bd.Location
+    name: str | None = None
+
+    @property
+    def world_location(self) -> bd.Location:
+        """Return the joint location in world coordinates."""
+        owner_location = self.owner.part.location or bd.Location()
+        return owner_location * self.location
+
+    @property
+    def position(self) -> bd.Vector:
+        """Return the joint position in world coordinates."""
+        return self.world_location.position
+
 
 class EntitySelectorMixin:
     """
@@ -87,6 +115,111 @@ class AlignmentMixin:
         # Simple logic: Grabbing half the width in the X direction.
         return self.bbox.size.X / 2
 
+    @staticmethod
+    def _vector_from_input(position) -> bd.Vector:
+        """Normalize a supported point-like input into a build123d.Vector."""
+        if isinstance(position, bd.Vector):
+            return bd.Vector(position)
+        if hasattr(position, "center"):
+            return bd.Vector(position.center())
+        return bd.Vector(position)
+
+    @staticmethod
+    def _location_from_input(position) -> bd.Location:
+        """Normalize a supported location-like input into a build123d.Location."""
+        if isinstance(position, bd.Location):
+            return bd.Location(position)
+        return bd.Location(AlignmentMixin._vector_from_input(position))
+
+    def add_joint(self, name: str, position=(0, 0, 0), rotation=(0, 0, 0)) -> Joint:
+        """
+        Define a named joint on the entity.
+
+        Args:
+            name (str): Joint name.
+            position: Local position relative to the entity origin. Accepts a
+                tuple/list, build123d.Vector, build123d.Location, or any object
+                exposing ``center()``.
+            rotation: Optional local rotation in degrees as ``(x, y, z)``.
+
+        Returns:
+            Joint: The created joint instance.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+
+        if isinstance(position, bd.Location):
+            joint_location = bd.Location(position)
+        else:
+            joint_location = bd.Location(self._vector_from_input(position), rotation)
+
+        joint = Joint(owner=self, location=joint_location, name=name)
+        self.joints[name] = joint
+        return joint
+
+    def add_joint_on_face(self, name: str, face="top", offset=0, rotation=(0, 0, 0)) -> Joint:
+        """
+        Define a named joint at the center of one bbox face.
+
+        Args:
+            name (str): Joint name.
+            face (str): ``top``, ``bottom``, ``left``, ``right``, ``front``, ``back``.
+            offset (float): Extra distance along the face normal.
+            rotation: Optional local rotation in degrees as ``(x, y, z)``.
+        """
+        center = self.bbox.center()
+        f = face.lower()
+
+        if f == "top":
+            position = (center.X, center.Y, self.bbox.max.Z + offset)
+        elif f == "bottom":
+            position = (center.X, center.Y, self.bbox.min.Z - offset)
+        elif f == "right":
+            position = (self.bbox.max.X + offset, center.Y, center.Z)
+        elif f == "left":
+            position = (self.bbox.min.X - offset, center.Y, center.Z)
+        elif f == "back":
+            position = (center.X, self.bbox.max.Y + offset, center.Z)
+        elif f == "front":
+            position = (center.X, self.bbox.min.Y - offset, center.Z)
+        else:
+            raise ValueError(f"Unknown face: {face}. Use top/bottom/left/right/front/back")
+
+        return self.add_joint(name, position=position, rotation=rotation)
+
+    def joint(self, name: str) -> Joint:
+        """Return a previously defined named joint."""
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+        try:
+            return self.joints[name]
+        except KeyError as exc:
+            raise ValueError(f"Unknown joint: {name}") from exc
+
+    def join(self, target, offset=(0, 0, 0)):
+        """
+        Join the current entity to a joint-like target by pure translation.
+
+        Args:
+            target: A ``Joint``, ``build123d.Location``, point-like object, or an
+                object exposing ``center()``.
+            offset: Additional translation after the joint alignment.
+        """
+        if TYPE_CHECKING:
+            assert isinstance(self, Entity)
+
+        source_joint = self.joint("default") if "default" in self.joints else Joint(self, bd.Location())
+
+        source_position = source_joint.position
+        target_location = target.world_location if isinstance(target, Joint) else self._location_from_input(target)
+        target_position = target_location.position
+        extra = self._vector_from_input(offset)
+
+        dx = target_position.X - source_position.X + extra.X
+        dy = target_position.Y - source_position.Y + extra.Y
+        dz = target_position.Z - source_position.Z + extra.Z
+        return self.move(dx, dy, dz)
+
     # Universal alignment (syntactic)
     def align(self, target, face="top", offset=0):
         """
@@ -101,7 +234,6 @@ class AlignmentMixin:
             offset (float): Addition gap between the current and the target.
                 (A positive number refers to a gap and a negative number refers to an embedding.)
         """
-
         # Grabbing the bounding box.
         t_box = target.bbox  # Target Bounding Box
         s_box = self.bbox  # Self Bounding Box (Current)
@@ -197,7 +329,7 @@ class ModificationMixin:
         # Convert primitive to a generic Solid by using its .wrapped property
         part_as_solid = bd.Solid(self.part.wrapped)
         new_part = part_as_solid.fillet(radius, edge_list=edges_to_fillet)
-        return self.__class__(self.wrap_result(new_part), self.name, self.tags)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags, self.joints)
 
     def chamfer(self, distance, edges=None):
         """
@@ -217,7 +349,7 @@ class ModificationMixin:
         # Convert primitive to a generic Solid by using its .wrapped property
         part_as_solid = bd.Solid(self.part.wrapped)
         new_part = part_as_solid.chamfer(distance, distance, edge_list=edges_to_chamfer)
-        return self.__class__(self.wrap_result(new_part), self.name, self.tags)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags, self.joints)
 
     def shell(self):
         """
@@ -228,7 +360,7 @@ class ModificationMixin:
 
         shell_obj = self.part.shell()
         
-        return self.__class__(shell_obj, self.name, self.tags)
+        return self.__class__(shell_obj, self.name, self.tags, self.joints)
 
     def offset(self, distance, kind=bd.Kind.ARC):
         """
@@ -269,4 +401,4 @@ class ModificationMixin:
             else:
                 raise e
 
-        return self.__class__(self.wrap_result(new_part), self.name, self.tags)
+        return self.__class__(self.wrap_result(new_part), self.name, self.tags, self.joints)

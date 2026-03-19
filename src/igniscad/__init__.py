@@ -4,6 +4,7 @@ from igniscad.primitives import *
 from igniscad.primitives_2d import *
 from igniscad.selectors import Axis
 from igniscad.visualization import show
+from igniscad.mixins import Joint
 
 from igniscad.helpers.err_handler import wrap_handlers
 from igniscad.helpers.logger_handler import setup
@@ -16,7 +17,7 @@ __all__ = ['Model', 'Group', # Containers
            'Box', 'Sphere', 'Cylinder', 'Torus', "Slot", "ISO_Hole", "CounterBoreHole", "CountersinkHole", # Primitives
            'Rectangle', 'Circle', 'Polygon', 'Text', 'Extrude', 'Revolve', 'Sweep', 'Loft', # 2D Primitives
            'show', # Visualization
-           'AlignmentMixin', # Mixins
+           'AlignmentMixin', 'Joint', # Mixins
            'Entity', # Base wrapper
            'Axis', # Selector axis
            'exceptions'
